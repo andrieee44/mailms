@@ -50,7 +50,7 @@ gap.
 Sending mail correctly is still the caller's responsibility, but mailms does
 some basic validation to catch common mistakes using
 [go-playground/validator](https://github.com/go-playground/validator).
-For example, rejecting `\r\n` in both headers and subjects and checking that
+For example, rejecting `\r\n` in both `headers` and `subject` and checking that
 `to` and `from` are valid email addresses. Authentication is handled with Go's
 standard [`net/smtp`](https://pkg.go.dev/net/smtp) package, which supports
 plain auth, making it easy to use with things like
