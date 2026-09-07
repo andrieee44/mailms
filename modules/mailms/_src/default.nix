@@ -1,5 +1,5 @@
 { lib, pkgs }:
-pkgs.buildGoModule {
+pkgs.pkgsStatic.buildGoModule {
   doCheck = true;
   name = "mailms";
   src = ./mailms;
