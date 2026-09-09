@@ -12,7 +12,7 @@ pkgs.pkgsStatic.buildGoModule {
   '';
 
   meta = {
-    description = "mailms - Simple Email Microservice";
+    description = "mailms - Mail Microservice";
     homepage = "https://github.com/andrieee44/mailms";
     license = lib.licenses.agpl3Plus;
     mainProgram = "mailms";
