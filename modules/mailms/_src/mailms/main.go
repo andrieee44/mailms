@@ -166,7 +166,8 @@ func main() {
 
 	err = run()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, `mailms:  %v
+		fmt.Fprintf(os.Stderr, `mailms: %v
+
 Usage:   mailms <ADDRESS>
 Example: mailms localhost:8080
 `, err)
