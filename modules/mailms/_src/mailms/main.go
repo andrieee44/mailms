@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log/slog"
 	"mime"
 	"net"
@@ -23,28 +22,6 @@ type Header struct {
 
 var validate *validator.Validate
 
-func decodeAndValidate(r io.Reader, v any) error {
-	var (
-		decoder *json.Decoder
-		err     error
-	)
-
-	decoder = json.NewDecoder(r)
-	decoder.DisallowUnknownFields()
-
-	err = decoder.Decode(v)
-	if err != nil {
-		return err
-	}
-
-	err = validate.Struct(v)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func mailHandler(w http.ResponseWriter, r *http.Request) {
 	type payload struct {
 		User    string   `json:"user"    validate:"required"`
@@ -59,13 +36,34 @@ func mailHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
+		decoder *json.Decoder
 		data    payload
 		builder strings.Builder
 		header  Header
 		err     error
 	)
 
-	err = decodeAndValidate(r.Body, &data)
+	decoder = json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	defer func() {
+		var err error
+
+		err = r.Body.Close()
+		if err != nil {
+			slog.Error("POST /mail", "error", err)
+		}
+	}()
+
+	err = decoder.Decode(&data)
+	if err != nil {
+		slog.Error("POST /mail", "error", err)
+		http.Error(w, "invalid JSON", http.StatusBadRequest)
+
+		return
+	}
+
+	err = validate.Struct(data)
 	if err != nil {
 		slog.Error("POST /mail", "error", err)
 		http.Error(w, "invalid JSON", http.StatusBadRequest)
@@ -117,7 +115,7 @@ func run() error {
 		err     error
 	)
 
-	if len(os.Args) == 1 {
+	if len(os.Args) < 2 {
 		return errors.New("missing argument <ADDRESS>")
 	}
 
