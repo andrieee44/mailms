@@ -51,22 +51,22 @@ func mailHandler(w http.ResponseWriter, r *http.Request) {
 
 		err = r.Body.Close()
 		if err != nil {
-			slog.Error("POST /mail", "error", err)
+			slog.Error(r.URL.String(), "method", r.Method, "error", err)
 		}
 	}()
 
 	err = decoder.Decode(&data)
 	if err != nil {
-		slog.Error("POST /mail", "error", err)
-		http.Error(w, "invalid JSON", http.StatusBadRequest)
+		slog.Error(r.URL.String(), "method", r.Method, "error", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 
 		return
 	}
 
 	err = validate.Struct(data)
 	if err != nil {
-		slog.Error("POST /mail", "error", err)
-		http.Error(w, "invalid JSON", http.StatusBadRequest)
+		slog.Error(r.URL.String(), "method", r.Method, "error", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 
 		return
 	}
@@ -98,8 +98,8 @@ func mailHandler(w http.ResponseWriter, r *http.Request) {
 		[]byte(builder.String()),
 	)
 	if err != nil {
-		slog.Error("POST /mail", "error", err)
-		http.Error(w, "failed to send mail", http.StatusServiceUnavailable)
+		slog.Error(r.URL.String(), "method", r.Method, "error", err)
+		http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
 
 		return
 	}
