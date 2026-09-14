@@ -46,15 +46,6 @@ func mailHandler(w http.ResponseWriter, r *http.Request) {
 	decoder = json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 
-	defer func() {
-		var err error
-
-		err = r.Body.Close()
-		if err != nil {
-			slog.Error(r.URL.String(), "method", r.Method, "error", err)
-		}
-	}()
-
 	err = decoder.Decode(&data)
 	if err != nil {
 		slog.Error(r.URL.String(), "method", r.Method, "error", err)
