@@ -16,11 +16,14 @@ import (
 )
 
 type Header struct {
-	Key   string `json:"key"   validate:"required,no_crlf"`
-	Value string `json:"value" validate:"required,no_crlf"`
+	Key   string `json:"key"   validate:"required,excludesall=\r\n"`
+	Value string `json:"value" validate:"required,excludesall=\r\n"`
 }
 
-var validate *validator.Validate
+var validate *validator.Validate = validator.New(
+	validator.WithRequiredStructEnabled(),
+	validator.WithTagNameFuncBlankOmit(),
+)
 
 func mailHandler(w http.ResponseWriter, r *http.Request) {
 	type payload struct {
@@ -30,7 +33,7 @@ func mailHandler(w http.ResponseWriter, r *http.Request) {
 		Port    string   `json:"port"    validate:"required"`
 		From    string   `json:"from"    validate:"required,email"`
 		To      []string `json:"to"      validate:"min=1,dive,email"`
-		Subject string   `json:"subject" validate:"required,no_crlf"`
+		Subject string   `json:"subject" validate:"required,excludesall=\r\n"`
 		Headers []Header `json:"headers" validate:"min=1,dive"`
 		Body    string   `json:"body"    validate:"required"`
 	}
@@ -111,21 +114,6 @@ func run() error {
 	}
 
 	address = os.Args[1]
-
-	validate = validator.New(
-		validator.WithRequiredStructEnabled(),
-		validator.WithTagNameFuncBlankOmit(),
-	)
-
-	err = validate.RegisterValidation(
-		"no_crlf",
-		func(fl validator.FieldLevel) bool {
-			return !strings.ContainsAny(fl.Field().String(), "\r\n")
-		},
-	)
-	if err != nil {
-		return err
-	}
 
 	mux = http.NewServeMux()
 	mux.HandleFunc("POST /mail", mailHandler)
