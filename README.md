@@ -70,10 +70,10 @@ mailms localhost:8080
 
 1. Go to [Google App Passwords](https://myaccount.google.com/apppasswords).
 1. Create an app password which is a 16-character code (remove the spaces
-  once generated).
+   once generated).
 1. Assuming mailms is running on `localhost:8080`, your address is
-  `me@example.com`, and your app password is `aaaa bbbb cccc dddd`, here's how
-  to send yourself an email:
+   `me@example.com`, and your app password is `aaaa bbbb cccc dddd`, here's how
+   to send yourself an email:
 
 ```shell
 curl -X POST http://localhost:8080/mail --json '{
